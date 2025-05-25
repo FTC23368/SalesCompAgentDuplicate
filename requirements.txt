@@ -4,7 +4,6 @@ slack_bolt
 slack_sdk
 openai
 pydantic
-unstructured
 Authlib
 
 

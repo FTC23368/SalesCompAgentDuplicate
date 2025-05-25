@@ -1,4 +1,6 @@
 import streamlit as st
+import pinecone
+print(pinecone.__file__)
 # Inject custom CSS for pill-shaped buttons
 st.markdown("""
     <style>
