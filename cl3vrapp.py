@@ -20,6 +20,10 @@ os.environ['SENDGRID_API_KEY']=st.secrets['SENDGRID_API_KEY']
 
 DEBUGGING=0
 
+st.set_page_config(
+        page_title="Cl3vr - Your AI assistant for Sales Compensation"
+    )
+
 def get_google_cloud_credentials():
     """
     Gets and sets up Google Cloud credentials for authentication.
@@ -192,6 +196,7 @@ def set_custom_font():
     """
     st.markdown(custom_css, unsafe_allow_html=True)
     st.markdown("<div class='footer'>© 2025 Cl3vr AI. All rights reserved.</div>", unsafe_allow_html=True)
+    
 
 def process_file(upload_file):
     #st.sidebar.image(upload_file)
