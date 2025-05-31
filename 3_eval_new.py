@@ -1,4 +1,5 @@
 import os
+import json
 import random
 import streamlit as st
 from langsmith import Client
@@ -10,9 +11,10 @@ from src.graph import salesCompAgent
 import pandas as pd
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from pydantic import BaseModel
-
+from src.google_firestore_integration import add_evals
 from st_aggrid import AgGrid, GridOptionsBuilder
 from datetime import datetime
+from google.oauth2 import service_account
 
 # Set environment variables for LangSmith
 os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]
@@ -20,6 +22,25 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_PROJECT"] = "sales-comp-eval"  
 
 DEBUGGING = 0
+
+def get_google_cloud_credentials():
+    """
+    Gets and sets up Google Cloud credentials for authentication.
+    This function:
+    1. Retrieves the Google service account key from Streamlit secrets
+    2. Converts the JSON string to a Python dictionary
+    3. Creates a credentials object that can be used to authenticate with Google services
+    
+    Returns:
+        service_account.Credentials: Google Cloud credentials object
+    """
+    # Get Google Cloud credentials from Streamlit secrets
+    js1 = st.secrets["GOOGLE_KEY"]
+    #print(" A-plus Google credentials JS: ", js1)
+    credentials_dict=json.loads(js1)
+    credentials = service_account.Credentials.from_service_account_info(credentials_dict)   
+    st.session_state.credentials = credentials
+    return credentials
 
 # Initialization with ChatOpenAI
 client = ChatOpenAI(model=st.secrets['OPENAI_MODEL'], temperature=0, api_key=st.secrets['OPENAI_API_KEY'])
@@ -100,7 +121,7 @@ def create_eval_dataset():
           "input":[
               { "question": "Hi"}, 
               { "answer": "How are you?"},
-              { "question": "My OTI is $150K and Annual quota is $30M."},
+              { "question": "What would be my commission for closing a $5M deal?"},
           ],
           "output":{
              "category":"commission",
@@ -167,9 +188,9 @@ def run_graph(conversation):
     initial_message = f"{conversation[-1]}"
     thread={"configurable":{"thread_id":thread_id}}
     parameters = {'message_history': message_history, 'initialMessage': initial_message}
-    print(f"Invoking agent graph {parameters=}")
+    #print(f"Invoking agent graph {parameters=}")
     actual_response = agent.graph.invoke(parameters, thread)
-    print(f"After graph invocation: {actual_response=}")
+    #print(f"After graph invocation: {actual_response=}")
     #output_list= convertListToMessages(conversation)
     #actual_response = agent.respond_to_question(output_list)
     return actual_response
@@ -184,7 +205,7 @@ def llm_judge_compare(query_list,expected_response,actual_response):
     m = HumanMessage(content=f"QUERY: {query_list}\nEXPECTED RESPONSE: {expected_response}\nACTUAL RESPONSE: {actual_response}")
     messages.append(m)
     resp=llm.with_structured_output(EvalMatch).invoke(messages)
-    print(f"EVAL Response: {resp}\n\n")
+    #print(f"EVAL Response: {resp}\n\n")
     return resp.matches, resp.reasoning
 
 def final_answer_correct(query, expected_category,expected_response,actual_response):
@@ -343,18 +364,18 @@ def show_results(results):
     df.drop(columns=['input_list'], errors='ignore', inplace=True)  # Remove input_list if it exists
     st.title("DF V1")
     show_df_1(df)
-    st.divider()
-    st.title("DF V2")
-    show_df_2(df)
-    st.divider()
-    st.title("DF V3")
-    show_df_3(df)
-    st.divider()
-    st.title("DF V4")
-    show_df_4(df)
-    st.divider()
-    st.title("DF V5o")
-    show_df_5(results)
+    #st.divider()
+    #st.title("DF V2")
+    #show_df_2(df)
+    #st.divider()
+    #st.title("DF V3")
+    #show_df_3(df)
+    #st.divider()
+    #st.title("DF V4")
+    #show_df_4(df)
+    #st.divider()
+    #st.title("DF V5o")
+    #show_df_5(results)
 
     
 
@@ -365,7 +386,7 @@ def main_run():
     # Get test examples from dataset and debug print
     dataset = langsmith_client.read_dataset(dataset_name=dataset_name)
     examples = list(langsmith_client.list_examples(dataset_id=dataset.id))
-    print("Number of examples found:", len(examples))  # Debug print
+    #print("Number of examples found:", len(examples))  # Debug print
 
     # Run evaluation for each test case
     results = []
@@ -407,19 +428,21 @@ def main_run():
                 "resp_reason": reason,
                 "input_list": inputs,  # Store the original input list for reference
             }
-            st.write(f"Got result {result_dict=}")
+            #st.write(f"Got result {result_dict=}")
             results.append(result_dict)
         except Exception as e:
             print(f"Error processing example: {str(e)}")
             continue
 
-    print("All results:\n\n", results)
+    #print("All results:\n\n", results)
 
     if results:  # Only create DataFrame if we have results
         st.session_state.results = results  # Store results in session state
         df = pd.DataFrame(results)
         show_results(results)
         df.to_csv('eval_results.csv')
+        credentials = get_google_cloud_credentials()
+        add_evals(credentials, results)
         #print("DataFrame head:", df.head())
         return df
     else:

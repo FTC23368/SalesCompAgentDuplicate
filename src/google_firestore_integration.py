@@ -89,3 +89,13 @@ def update_prompt_by_name(credentials, user, prompt_name, new_value):
         return f"Found one match {res}. Document {document_id} updated: prompt to {new_value}"
     else:
         return f"Found multiple matches {res}. Not updating"
+    
+def add_evals(credentials, records):
+    db = firestore.Client(credentials=credentials)
+    for record in records:
+        #timestamp = record['start_time']
+        #duration = record['duration']
+        #input = record['input']
+        #expected = record['expected']
+        collection_ref = db.collection(u'Evals').document() 
+        collection_ref.set(record)
