@@ -1,8 +1,8 @@
 # NEXT STEPS WITH AMIT (Updated: 2/8):
 
-1. Complete Eval setup
+1. Complete Eval setup - COMPLETED
 
-2. Embeddings migration plan
+2. Embeddings migration plan - Save documents in Firestore and include the entire doucment in the prompt.
 
 3. contest agent RAG setup
 
