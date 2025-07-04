@@ -52,7 +52,7 @@ def get_contest_info():
         return contestrules
 
 # Define valid categories
-VALID_CATEGORIES = ["policy", "commission", "contest", "ticket", "smalltalk", "clarify", "planexplainer", "feedbackcollector", "analytics", "research"]
+VALID_CATEGORIES = ["policy", "commission", "contest", "ticket", "smalltalk", "clarify", "planexplainer", "feedbackcollector", "analytics"]
 
 # Define the salesCompAgent class
 class salesCompAgent():
