@@ -4,6 +4,8 @@
 
 2. Embeddings migration plan - Save documents in Firestore and include the entire doucment in the prompt.
 
+3. I have to consider on how to reduce the response time. Currently, it is taking very long. Plus, if possible, I'd like the agent to start streaming the response and not take the entire time thinking..
+
 3. contest agent RAG setup
 
 

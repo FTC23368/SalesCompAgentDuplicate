@@ -1,24 +1,33 @@
-import streamlit as st
-from src.create_llm_message import create_llm_msg
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, BaseMessage
-from src.prompt_store import get_prompt
+def get_full_policy_content(self):
+        files = list_files()
+        policy_files = [f for f in files if "Policy" in (f.get("doc_category") or [])]
+        #st.write(f"{files=}, {policy_files=}")
+        #st.dataframe(policy_files)
 
-class ClarifyAgent:
+        total_content = []
 
-    def __init__(self, model):
-        self.model = model
-
-    def clarify_and_classify(self, user_query: str, messageHistory: list[BaseMessage]) -> str:
-        clarify_prompt = get_prompt("clarify").format(user_query=user_query)
-        llm_messages = create_llm_msg(clarify_prompt, messageHistory)
-        llm_response = self.model(llm_messages)
-        full_response = llm_response.content
-        return full_response
+        for files in policy_files:
+            content_filename = files["file_name"]
+            #st.write(f"# {content_filename=}")
+            content = get_text_content(content_filename)
+            #st.write(content)
+            total_content.append(content)
+        return "\n".join(total_content)
     
-    def clarify_agent(self, state: dict) -> dict:
-        full_response = self.clarify_and_classify(state['initialMessage'], state['message_history'])
-        return {
-            "lnode": "clarify_agent",
-            "responseToUser": full_response,
-            "category": "clarify"
-        }
+
+    def retrieve_documents(self, query: str) -> List[str]:
+        """
+        Retrieve relevant documents based on the given query.
+        
+        :param query: User's query string
+        :return: List of relevant document contents
+        """
+        # Generate an embedding for the query and retrieve relevant documents from Pinecone.
+        embedding = self.client.embeddings.create(model="text-embedding-ada-002", input=query).data[0].embedding
+        results = self.index.query(vector=embedding, top_k=3, namespace="", include_metadata=True)
+        
+        retrieved_content = [r['metadata']['text'] for r in results['matches']]
+        full_content = self.get_full_policy_content()
+        retrieved_content.append(full_content)
+        print(f"{query=},{retrieved_content=}")
+        return retrieved_content

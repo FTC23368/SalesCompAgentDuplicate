@@ -1,4 +1,4 @@
-# streamlit_app.py
+# cl3vrapp.py
 # Copyright 2024 Jahangir Iqbal
 
 import os
@@ -19,6 +19,27 @@ os.environ['LANGCHAIN_ENDPOINT']="https://api.smith.langchain.com"
 os.environ['SENDGRID_API_KEY']=st.secrets['SENDGRID_API_KEY']
 
 DEBUGGING=0
+
+st.set_page_config(
+        page_title="Cl3vr - Your AI assistant for Sales Compensation"
+    )
+
+import streamlit as st
+from src.google_firestore_integration import list_files, get_file_content, get_text_content
+import pandas as pd
+
+st.title("Policy Documents")
+
+files = list_files()
+policy_files = [f for f in files if "Policy" in (f.get("doc_category") or [])]
+#st.write(f"{files=}, {policy_files=}")
+st.dataframe(policy_files)
+
+for files in policy_files:
+    content_filename = files["file_name"]
+    st.write(f"# {content_filename=}")
+    content = get_text_content(content_filename)
+    st.write(content)
 
 def get_google_cloud_credentials():
     """
@@ -191,6 +212,8 @@ def set_custom_font():
     </style>
     """
     st.markdown(custom_css, unsafe_allow_html=True)
+    st.markdown("<div class='footer'>© 2025 Cl3vr AI. All rights reserved.</div>", unsafe_allow_html=True)
+    
 
 def process_file(upload_file):
     #st.sidebar.image(upload_file)
@@ -240,29 +263,8 @@ def start_chat(container=st):
     # Setup a simple landing page with title and avatars
     st.markdown("<h1 class='app-title' style='color: #87CEEB; font-size: 3.5rem;'>Cl3vr</h1>", unsafe_allow_html=True)
     st.markdown("<div class='section-title'>Your AI assistant for Sales Compensation</div>", unsafe_allow_html=True)
-    st.markdown("<div class='section-subtitle'>Get instant answers to your sales compensation questions, analyze data, and streamline your compensation workflows with AI-powered assistance.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-subtitle'>Get instant answers to your sales compensation questions, design comp plans or SPIFs, analyze performance data, and streamline your workflows—all with with AI-powered assistance.</div>", unsafe_allow_html=True)
     
-
-    x="""st.markdown(""
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
-        <button style="background-color: transparent; color: #4CAF50; border: 1px solid #4CAF50; padding: 2px 16px; border-radius: 20px; cursor: pointer; font-weight: 500;">
-            <span style="color: #4CAF50; font-size: 0.9rem; font-weight: normal;">Policy Questions</span>
-        </button>
-        <button style="background-color: transparent; color: #2196F3; border: 1px solid #2196F3; padding: 2px 16px; border-radius: 20px; cursor: pointer; font-weight: 500;">
-            <span style="color: #2196F3; font-size: 0.9rem; font-weight: normal;">Commission Calculation</span>
-        </button>
-        <button style="background-color: transparent; color: #FF9800; border: 1px solid #FF9800; padding: 2px 16px; border-radius: 20px; cursor: pointer; font-weight: 500;">
-            <span style="color: #FF9800; font-size: 0.9rem; font-weight: normal;">Data Analysis</span>
-        </button>
-        <button style="background-color: transparent; color: #E91E63; border: 1px solid #E91E63; padding: 2px 16px; border-radius: 20px; cursor: pointer; font-weight: 500;">
-            <span style="color: #E91E63; font-size: 0.9rem; font-weight: normal;">Plan Design</span>
-        </button>
-        <button style="background-color: transparent; color: #9C27B0; border: 1px solid #9C27B0; padding: 2px 16px; border-radius: 20px; cursor: pointer; font-weight: 500;">
-            <span style="color: #9C27B0; font-size: 0.9rem; font-weight: normal;">Research</span>
-        </button>
-    </div>
-    "", unsafe_allow_html=True)
-    """
     
     # Keeping context of conversations, checks if there is anything in messages array
     # If not, it creates an empty list where all messages will be saved
@@ -280,27 +282,6 @@ def start_chat(container=st):
         if message["role"] != "system":
             with st.chat_message(message["role"]):
                 st.markdown(message["content"]) 
-
-
-    
-    #if prompt := st.chat_input("Ask me anything related to sales comp..", accept_file=True, file_type=["pdf", "md", "doc", "csv"]):
-        # First determine if we have a file upload (dictionary) or just text (string)
-    #    if isinstance(prompt, dict):
-    #        user_text = prompt["text"]
-            
-            # Check if files were uploaded
-    #        if prompt["files"]:
-    #            uploaded_file = prompt["files"][0]
-    #            file_contents, filetype = process_file(uploaded_file)
-                
-    #            if filetype != 'csv':
-    #                user_text = user_text + f"\n Here are the file contents: {file_contents}"
-    #    else:
-            # If prompt is just a string (no file uploaded)
-    #        user_text = prompt
-            
-    #    escaped_prompt = user_text.replace("$", "\\$")
-    #    st.session_state.messages.append({"role": "user", "content": escaped_prompt})
     
 
     # Handle new user input. Note: walrus operator serves two functions, it checks if the user entered any input.
@@ -343,25 +324,22 @@ def start_chat(container=st):
             parameters['csv_data'] = file_contents
             st.session_state['csv_data'] = file_contents
         # Stream responses from the instance of salesCompAgent which is called "app"
-        for s in app.graph.stream(parameters, thread):
-    
-            if DEBUGGING:
-                print(f"GRAPH RUN: {s}")
-                st.write(s)
-            for k,v in s.items():
+        with st.spinner("Thinking ...", show_time=True):
+        
+            for s in app.graph.stream(parameters, thread):
+        
                 if DEBUGGING:
-                    print(f"Key: {k}, Value: {v}")
-            if resp := v.get("responseToUser"):
-                with st.chat_message("assistant"):
-                    st.write(resp) 
-                st.session_state.messages.append({"role": "assistant", "content": resp})
+                    print(f"GRAPH RUN: {s}")
+                    st.write(s)
+                for k,v in s.items():
+                    if DEBUGGING:
+                        print(f"Key: {k}, Value: {v}")
+                if resp := v.get("responseToUser"):
+                    with st.chat_message("assistant"):
+                        st.write(resp) 
+                    st.session_state.messages.append({"role": "assistant", "content": resp})
 
 if __name__ == '__main__':
     initialize_prompts()
-    set_custom_font()
-    
-    # Start the chat in the main area
-    start_chat()
-    
-    # Add the footer with copyright at the very end of the app
-    st.markdown("<div class='footer'>© 2025 Cl3vr AI. All rights reserved.</div>", unsafe_allow_html=True)
+    #set_custom_font()
+    #start_chat()

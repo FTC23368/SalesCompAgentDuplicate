@@ -123,7 +123,7 @@ def init_firestore():
             raise RuntimeError("Firebase credentials not found in st.secrets")
         cred = credentials.Certificate(dict(cred_info))
 
-        st.sidebar.dataframe(cred_info)
+        #st.sidebar.dataframe(cred_info)
 
         # allow overriding the bucket used for uploads
         bucket_name = cred_info.get("bucket_name")
@@ -155,7 +155,7 @@ def extract_text(file_bytes: bytes, filename: str, file_type: str) -> str:
 
 def upload_file(file_bytes: bytes, filename: str, file_type: str, doc_category: list, doc_name: str):
     """Upload the file to Firebase Storage and store metadata only."""
-    st.sidebar.write(f"uploadfile: {filename=}, {file_type=}")
+    #st.sidebar.write(f"uploadfile: {filename=}, {file_type=}")
     db = init_firestore()
     bucket = get_bucket()
     uploaded_at = datetime.utcnow()

@@ -4,6 +4,7 @@ from typing import List
 from src.create_llm_message import create_llm_message, create_llm_msg
 from langchain_core.messages import BaseMessage
 from src.prompt_store import get_prompt
+from src.google_firestore_integration import list_files, get_file_content, get_text_content
 
 # When PolicyAgent object is created, it's initialized with a client, a model, and an index. 
 # The main entry point is the policy_agent method. You can see workflow.add_node for policy_agent node in graph.py
@@ -22,6 +23,23 @@ class PolicyAgent:
         self.index = index
         self.model = model
 
+    def get_full_policy_content(self):
+        files = list_files()
+        policy_files = [f for f in files if "Policy" in (f.get("doc_category") or [])]
+        #st.write(f"{files=}, {policy_files=}")
+        #st.dataframe(policy_files)
+
+        total_content = []
+
+        for files in policy_files:
+            content_filename = files["file_name"]
+            #st.write(f"# {content_filename=}")
+            content = get_text_content(content_filename)
+            #st.write(content)
+            total_content.append(content)
+        return "\n".join(total_content)
+    
+
     def retrieve_documents(self, query: str) -> List[str]:
         """
         Retrieve relevant documents based on the given query.
@@ -34,6 +52,8 @@ class PolicyAgent:
         results = self.index.query(vector=embedding, top_k=3, namespace="", include_metadata=True)
         
         retrieved_content = [r['metadata']['text'] for r in results['matches']]
+        full_content = self.get_full_policy_content()
+        retrieved_content.append(full_content)
         print(f"{query=},{retrieved_content=}")
         return retrieved_content
 
