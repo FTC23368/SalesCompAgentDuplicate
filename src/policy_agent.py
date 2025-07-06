@@ -22,6 +22,7 @@ class PolicyAgent:
         self.client = client
         self.index = index
         self.model = model
+        #self.cached_full_content = self.get_full_policy_content()
 
     def get_full_policy_content(self):
         files = list_files()
@@ -49,11 +50,12 @@ class PolicyAgent:
         """
         # Generate an embedding for the query and retrieve relevant documents from Pinecone.
         embedding = self.client.embeddings.create(model="text-embedding-ada-002", input=query).data[0].embedding
-        results = self.index.query(vector=embedding, top_k=3, namespace="", include_metadata=True)
+        results = self.index.query(vector=embedding, top_k=1, namespace="", include_metadata=True)
         
         retrieved_content = [r['metadata']['text'] for r in results['matches']]
         full_content = self.get_full_policy_content()
         retrieved_content.append(full_content)
+        #retrieved_content.append(self.cached_full_content)
         print(f"{query=},{retrieved_content=}")
         return retrieved_content
 
