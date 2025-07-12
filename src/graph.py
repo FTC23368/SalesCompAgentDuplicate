@@ -30,6 +30,7 @@ class AgentState(TypedDict):
     agent: str
     initialMessage: str
     responseToUser: str
+    incrementalResponse: str
     lnode: str
     category: str
     sessionState: Dict
