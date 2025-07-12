@@ -43,8 +43,8 @@ class PolicyAgent:
     
     
     
-
-    def retrieve_documents(self, query: str) -> List[str]:
+    @st.cache_data
+    def retrieve_documents(_self, query: str) -> List[str]:
         """
         Retrieve relevant documents based on the given query.
         
@@ -52,8 +52,8 @@ class PolicyAgent:
         :return: List of relevant document contents
         """
         # Generate an embedding for the query and retrieve relevant documents from Pinecone.
-        embedding = self.client.embeddings.create(model="text-embedding-ada-002", input=query).data[0].embedding
-        results = self.index.query(vector=embedding, top_k=1, namespace="", include_metadata=True)
+        embedding = _self.client.embeddings.create(model="text-embedding-ada-002", input=query).data[0].embedding
+        results = _self.index.query(vector=embedding, top_k=1, namespace="", include_metadata=True)
         
         retrieved_content = [r['metadata']['text'] for r in results['matches']]
         full_content = get_full_policy_content()
