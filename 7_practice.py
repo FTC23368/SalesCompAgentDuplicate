@@ -23,7 +23,7 @@ def get_full_policy_content(self):
         :return: List of relevant document contents
         """
         # Generate an embedding for the query and retrieve relevant documents from Pinecone.
-        embedding = self.client.embeddings.create(model="text-embedding-ada-002", input=query).data[0].embedding
+        embedding = self.client.embeddings.create(model=st.secrets['EMBEDDING_MODEL'], input=query).data[0].embedding
         results = self.index.query(vector=embedding, top_k=3, namespace="", include_metadata=True)
         
         retrieved_content = [r['metadata']['text'] for r in results['matches']]

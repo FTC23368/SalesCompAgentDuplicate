@@ -42,7 +42,7 @@ class AgentState(TypedDict):
     analytics_question: str
 
 # Define the structure of outputs from different agents using Pydantic (BaseModel) for runtime data validation 
-# and serialization
+# and serialization. Used in with_structured_output
 class Category(BaseModel):
     category: str
 
@@ -57,7 +57,7 @@ VALID_CATEGORIES = ["policy", "commission", "contest", "ticket", "smalltalk", "c
 
 # Define the salesCompAgent class
 class salesCompAgent():
-    def __init__(self, api_key):
+    def __init__(self, api_key, embedding_model):
         # Initialize the ChatOpenAI model (from LangChain) and OpenAI client with the given API key
         # ChatOpenAI is used for chat interactions
         # OpenAI is used for creating embeddings
@@ -80,13 +80,13 @@ class salesCompAgent():
 
         # Initialize the PolicyAgent, CommissionAgent, ContestAgent, TicketAgent, ClarifyAgent, SmallTalkAgent,
         # PlanExplainerAgent, FeedbackCollectorAgent
-        self.policy_agent_class = PolicyAgent(self.client, self.model, self.index)
+        self.policy_agent_class = PolicyAgent(self.client, self.model, self.index, embedding_model)
         self.commission_agent_class = CommissionAgent(self.model)
-        self.contest_agent_class = ContestAgent(self.client, self.model, self.index)
+        self.contest_agent_class = ContestAgent(self.client, self.model, self.index, embedding_model)
         self.ticket_agent_class = TicketAgent(self.model)
         self.clarify_agent_class = ClarifyAgent(self.model) # Capable of passing reference to the main agent
         self.small_talk_agent_class = SmallTalkAgent(self.client, self.model)
-        self.plan_explainer_agent_class = PlanExplainerAgent(self.client, self.model, self.index)
+        self.plan_explainer_agent_class = PlanExplainerAgent(self.client, self.model, self.index, embedding_model)
         self.feedback_collector_agent_class = FeedbackCollectorAgent(self.model)
         self.analytics_agent_class = AnalyticsAgent(self.model)
         self.research_agent_class = ResearchAgent(self.client, self.model)

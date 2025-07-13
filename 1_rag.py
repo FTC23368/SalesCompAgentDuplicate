@@ -60,9 +60,9 @@ def embed(text,filename, filetype, doc_category, doc_name):
         # Create unique hash for the chunk
         hash=hashlib.md5(d.page_content.encode('utf-8')).hexdigest()
         # Generate embedding using OpenAI
-        embedding=client.embeddings.create(model="text-embedding-ada-002", input=d.page_content).data[0].embedding
+        embedding=client.embeddings.create(model=st.secrets['EMBEDDING_MODEL'], input=d.page_content).data[0].embedding
         # Create metadata for the chunk
-        metadata={"hash":hash,"text":d.page_content,"index":idx,"model":"text-embedding-ada-003","docname":filename}
+        metadata={"hash":hash,"text":d.page_content,"index":idx,"model":st.secrets['EMBEDDING_MODEL'],"docname":filename}
         # Store in Pinecone
         index.upsert([(hash,embedding,metadata)])
     

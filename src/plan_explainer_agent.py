@@ -11,7 +11,7 @@ from src.prompt_store import get_prompt
 
 class PlanExplainerAgent:
     
-    def __init__(self, client, model, index):
+    def __init__(self, client, model, index, embedding_model):
         """
         Initialize the PlanExplainerAgent with necessary components.
         
@@ -22,6 +22,7 @@ class PlanExplainerAgent:
         self.client = client
         self.index = index
         self.model = model
+        self.embedding_model = embedding_model
 
     def retrieve_documents(self, query: str) -> List[str]:
         """
@@ -31,7 +32,7 @@ class PlanExplainerAgent:
         :return: List of relevant document contents
         """
         # Generate an embedding for the query and retrieve relevant documents from Pinecone.
-        embedding = self.client.embeddings.create(model="text-embedding-ada-002", input=query).data[0].embedding
+        embedding = self.client.embeddings.create(model=self.embedding_model, input=query).data[0].embedding
         results = self.index.query(vector=embedding, top_k=3, namespace="", include_metadata=True)
         
         retrieved_content = [r['metadata']['text'] for r in results['matches']]

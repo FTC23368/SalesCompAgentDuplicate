@@ -13,7 +13,7 @@ from typing import List
 
 class ContestAgent:
     
-    def __init__(self, client, model, index):
+    def __init__(self, client, model, index, embedding_model):
         """
         Initialize the ContestAgent with a ChatOpenAI model.
         
@@ -22,6 +22,7 @@ class ContestAgent:
         self.client = client
         self.index = index
         self.model = model
+        self.embedding_model = embedding_model
 
     def retrieve_documents(self, query: str) -> List[str]:
         """
@@ -31,7 +32,7 @@ class ContestAgent:
         :return: List of relevant document contents
         """
         # Generate an embedding for the query and retrieve relevant documents from Pinecone.
-        embedding = self.client.embeddings.create(model="text-embedding-ada-002", input=query).data[0].embedding
+        embedding = self.client.embeddings.create(model=self.embedding_model, input=query).data[0].embedding
         results = self.index.query(vector=embedding, top_k=3, namespace="", include_metadata=True)
         
         retrieved_content = [r['metadata']['text'] for r in results['matches']]

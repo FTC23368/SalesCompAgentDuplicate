@@ -260,7 +260,7 @@ def start_chat(container=st):
             elif m["role"] == "assistant":
                 message_history.append(AIMessage(content=m["content"]))
         
-        app = salesCompAgent(st.secrets['OPENAI_API_KEY'])
+        app = salesCompAgent(st.secrets['OPENAI_API_KEY'], st.secrets['EMBEDDING_MODEL'])
         thread={"configurable":{"thread_id":thread_id}}
         parameters = {'initialMessage': prompt.text, 'sessionState': st.session_state, 
                         'sessionHistory': st.session_state.messages, 
