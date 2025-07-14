@@ -1,6 +1,3 @@
-# cl3vrapp.py
-# Copyright 2024 Jahangir Iqbal
-
 import os
 import json
 import PyPDF2
@@ -9,9 +6,8 @@ import streamlit as st
 from src.graph import salesCompAgent
 from src.google_firestore_integration import get_all_prompts
 from google.oauth2 import service_account
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, BaseMessage
+from langchain_core.messages import HumanMessage, AIMessage
 
-# Set environment variables for Langchain and SendGrid
 os.environ["LANGCHAIN_TRACING_V2"]="true"
 os.environ["LANGCHAIN_API_KEY"]=st.secrets['LANGCHAIN_API_KEY']
 os.environ["LANGCHAIN_PROJECT"]="SalesCompAgent"
