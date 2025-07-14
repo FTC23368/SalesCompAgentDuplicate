@@ -17,32 +17,14 @@ os.environ['SENDGRID_API_KEY']=st.secrets['SENDGRID_API_KEY']
 DEBUGGING=0
 
 def get_google_cloud_credentials():
-    """
-    Gets and sets up Google Cloud credentials for authentication.
-    This function:
-    1. Retrieves the Google service account key from Streamlit secrets
-    2. Converts the JSON string to a Python dictionary
-    3. Creates a credentials object that can be used to authenticate with Google services
-    
-    Returns:
-        service_account.Credentials: Google Cloud credentials object
-    """
     # Get Google Cloud credentials from Streamlit secrets
     js1 = st.secrets["GOOGLE_KEY"]
-    #print(" A-plus Google credentials JS: ", js1)
     credentials_dict=json.loads(js1)
     credentials = service_account.Credentials.from_service_account_info(credentials_dict)   
     st.session_state.credentials = credentials
     return credentials
 
 def initialize_prompts():
-    """
-    Initializes the application by setting up Google credentials and loading prompts.
-    This function:
-    1. Checks if credentials exist in the session state, if not gets new credentials
-    2. Checks if prompts exist in the session state, if not fetches them from Firestore
-    3. Stores both credentials and prompts in Streamlit's session state for later use
-    """
     if "credentials" not in st.session_state:
         st.session_state.credentials = get_google_cloud_credentials()
     if "prompts" not in st.session_state:
@@ -189,15 +171,11 @@ def set_custom_font():
     st.markdown("<div class='footer'>© 2025 Cl3vr AI. All rights reserved.</div>", unsafe_allow_html=True)
     
 def process_file(upload_file):
-    #st.sidebar.image(upload_file)
-    #return
-    #PDF=application/pdf
-    #CSV=text/csv
     with st.sidebar.expander("File contents"):
         st.write("file type:", upload_file.type)
     filetype = upload_file.type
+    
     if filetype == 'application/pdf':
-
         pdfReader = PyPDF2.PdfReader(upload_file)
         count = len(pdfReader.pages)
         text=""
