@@ -10,12 +10,9 @@ class SmallTalkAgent:
     def generate_response(self, user_query: str, messageHistory: list[BaseMessage]) -> str:
         small_talk_prompt = get_prompt("smalltalk").format(user_query=user_query)
         llm_messages = create_llm_msg(small_talk_prompt, messageHistory)
-        #llm_response = self.model.invoke(llm_messages)
-        #small_talk_response = llm_response.content
         return self.model.stream(llm_messages)
 
     def small_talk_agent(self, state: dict) -> dict:
-        full_response = self.generate_response(state['initialMessage'], state['message_history'])
         return {
             "lnode": "small_talk_agent", 
             "incrementalResponse": self.generate_response(state['initialMessage'], state['message_history']),
