@@ -10,14 +10,12 @@ class ClarifyAgent:
     def clarify_and_classify(self, user_query: str, messageHistory: list[BaseMessage]) -> str:
         clarify_prompt = get_prompt("clarify").format(user_query=user_query)
         llm_messages = create_llm_msg(clarify_prompt, messageHistory)
-        llm_response = self.model.invoke(llm_messages)
-        full_response = llm_response.content
-        return full_response
+        return self.model.stream(llm_messages)
      
     def clarify_agent(self, state: dict) -> dict:
-        full_response = self.clarify_and_classify(state['initialMessage'], state['message_history'])
+        full_response = 
         return {
             "lnode": "clarify_agent", 
-            "responseToUser": full_response,
+            "incrementalResponse": self.clarify_and_classify(state['initialMessage'], state['message_history']),
             "category": "clarify"
         }
