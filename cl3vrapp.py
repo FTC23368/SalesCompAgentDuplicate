@@ -210,7 +210,7 @@ def start_chat(container=st):
     for message in st.session_state.messages:
         if message["role"] != "system":
             with st.chat_message(message["role"]):
-                st.markdown(message["content"]) 
+                st.markdown(message["content"].replace("$", "\\$")) 
     
     if prompt := st.chat_input("Ask me anything related to sales comp..", accept_file=True, file_type=["pdf", "md", "doc", "csv"]):
         if prompt and prompt["files"]:
@@ -219,11 +219,12 @@ def start_chat(container=st):
             if filetype != 'csv':
                 prompt.text = prompt.text + f"\n Here are the file contents: {file_contents}"
         
-        escaped_prompt = prompt.text.replace("$", "\\$")
-        st.session_state.messages.append({"role": "user", "content": escaped_prompt})
+        user_prompt = prompt.text
+        st.session_state.messages.append({"role": "user", "content": user_prompt})
         
         with st.chat_message("user"):
-            st.write(escaped_prompt)
+            st.write(user_prompt.replace("$", "\\$"))
+
         message_history = []
         msgs = st.session_state.messages
     
@@ -267,7 +268,7 @@ def start_chat(container=st):
                         placeholder = st.empty()
                         for response in resp:
                             full_response = full_response + response.content
-                            placeholder.write(full_response)
+                            placeholder.markdown(full_response.replace("$", "\\$"))
                     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 if __name__ == '__main__':

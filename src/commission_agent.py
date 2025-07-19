@@ -7,17 +7,14 @@ class CommissionAgent:
     def __init__(self, model):
         self.model = model
 
-    def generate_commission_response(self, user_query: str, messageHistory: list[BaseMessage]) -> str:
+    def generate_commission_response(self, messageHistory: list[BaseMessage]) -> str:
         commission_prompt = get_prompt("commission")
         llm_messages = create_llm_msg(commission_prompt, messageHistory)
-        llm_response = self.model.invoke(llm_messages)
-        full_response = llm_response.content
-        return full_response
+        return self.model.stream(llm_messages)
 
     def commission_agent(self, state: dict) -> dict:
-        full_response = self.generate_commission_response(state['initialMessage'], state['message_history'])
         return {
             "lnode": "commission_agent", 
-            "responseToUser": full_response,
+            "incrementalResponse": self.generate_commission_response(state['message_history']),
             "category": "commission"
         }
