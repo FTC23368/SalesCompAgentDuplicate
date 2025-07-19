@@ -13,7 +13,6 @@ class ClarifyAgent:
         return self.model.stream(llm_messages)
      
     def clarify_agent(self, state: dict) -> dict:
-        full_response = 
         return {
             "lnode": "clarify_agent", 
             "incrementalResponse": self.clarify_and_classify(state['initialMessage'], state['message_history']),
