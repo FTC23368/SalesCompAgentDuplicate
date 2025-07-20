@@ -7,7 +7,8 @@ class ClarifyAgent:
     def __init__(self, model):
         self.model = model
     
-    def clarify_and_classify(self, user_query: str, messageHistory: list[BaseMessage]) -> str:
+    def clarify_and_classify(self, messageHistory: list[BaseMessage]) -> str:
+        user_query = messageHistory[-1].content
         clarify_prompt = get_prompt("clarify").format(user_query=user_query)
         llm_messages = create_llm_msg(clarify_prompt, messageHistory)
         return self.model.stream(llm_messages)
@@ -15,6 +16,6 @@ class ClarifyAgent:
     def clarify_agent(self, state: dict) -> dict:
         return {
             "lnode": "clarify_agent", 
-            "incrementalResponse": self.clarify_and_classify(state['initialMessage'], state['message_history']),
+            "incrementalResponse": self.clarify_and_classify(state['message_history']),
             "category": "clarify"
         }

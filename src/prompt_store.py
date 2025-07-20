@@ -73,6 +73,13 @@ something which the user is not happy about and would like someone to listen, un
 9) **clarify**: Select this category if the request is unclear, ambiguous, or does not fit into the above categories. 
 Ask the user for more details.
     - Example: "I'm not happy with my compensation plan"
+    - Example: "Something is wrong with my commission"
+    - Example: "I need help with sales compensation"
+    - Example: "Can you explain how this works?"
+    - Example: "I have a question about my pay"
+    - Example: "There's an issue I need to discuss"
+    - Example: "I want to understand my situation better"
+    - Example: "Can you help me figure this out?"
 
 Remember to consider the context and content of the request, even if specific keywords like 'policy' or 'commission' 
 are not used.
