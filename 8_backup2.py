@@ -315,8 +315,9 @@ def start_chat(container=st):
         # Initialize salesCompAgent in graph.py 
         app = salesCompAgent(st.secrets['OPENAI_API_KEY'])
         thread={"configurable":{"thread_id":thread_id}}
-        parameters = {'initialMessage': prompt.text, 'sessionState': st.session_state, 
-                        'sessionHistory': st.session_state.messages, 
+        parameters = {'initialMessage': prompt.text, 
+                      #'sessionState': st.session_state, 
+                        #'sessionHistory': st.session_state.messages, 
                         'message_history': message_history}
         if 'csv_data' in st.session_state:
             parameters['csv_data'] = st.session_state['csv_data']

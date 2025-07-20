@@ -30,8 +30,8 @@ class AgentState(TypedDict):
     incrementalResponse: str
     lnode: str
     category: str
-    sessionState: Dict
-    sessionHistory: Annotated[list[AnyMessage], add_messages]
+    #sessionState: Dict
+    #sessionHistory: Annotated[list[AnyMessage], add_messages]
     message_history: list[BaseMessage]
     email: str
     name: str

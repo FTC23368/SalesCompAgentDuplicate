@@ -237,8 +237,9 @@ def start_chat(container=st):
         
         app = salesCompAgent(st.secrets['OPENAI_API_KEY'], st.secrets['EMBEDDING_MODEL'])
         thread={"configurable":{"thread_id":thread_id}}
-        parameters = {'initialMessage': prompt.text, 'sessionState': st.session_state, 
-                        'sessionHistory': st.session_state.messages, 
+        parameters = {'initialMessage': prompt.text, 
+                      #'sessionState': st.session_state, 
+                        #'sessionHistory': st.session_state.messages, 
                         'message_history': message_history}
         
         if 'csv_data' in st.session_state:

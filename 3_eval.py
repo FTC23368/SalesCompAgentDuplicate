@@ -92,8 +92,8 @@ def eval():
             
             response = agent.graph.invoke({
                 'initialMessage': question, 
-                'sessionState': st.session_state, 
-                'sessionHistory': st.session_state.messages,
+                #'sessionState': st.session_state, 
+                #'sessionHistory': st.session_state.messages,
                 'message_history': message_history
             })
             
