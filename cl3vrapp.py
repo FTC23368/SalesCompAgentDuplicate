@@ -30,145 +30,6 @@ def initialize_prompts():
     if "prompts" not in st.session_state:
         prompts = get_all_prompts(st.session_state.credentials)
         st.session_state.prompts = prompts
-
-def set_custom_font():
-    custom_css = """
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
-    html, body, [class*="st-"] {
-        font-family: 'Inter', sans-serif !important;
-    }
-    
-    /* Hide Streamlit header and footer */
-    #MainMenu {visibility: hidden;}
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-
-    /* Improved typography */
-    h1 {
-        font-weight: 700 !important;
-        letter-spacing: -0.5px !important;
-        margin-bottom: 1rem !important;
-    }
-    
-    h4 {
-        font-weight: 600 !important;
-        letter-spacing: -0.3px !important;
-        margin-top: 0.75rem !important;
-        margin-bottom: 0.5rem !important;
-    }
-    
-    p {
-        font-weight: 400 !important;
-        line-height: 1.6 !important;
-        color: #4A4A4A !important;
-        margin-bottom: 1.5rem !important;
-    }
-    
-    /* App title styling */
-    .app-title {
-        color: #87CEEB;
-        font-size: 2.8rem;
-        font-weight: 700;
-        margin-bottom: 1.2rem;
-    }
-    
-    /* Section title styling */
-    .section-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-top: 1.5rem;
-        margin-bottom: 0.75rem;
-    }
-    
-    /* Section subtitle styling */
-    .section-subtitle {
-        font-size: 1rem;
-        font-weight: normal;
-        margin-bottom: 1.5rem;
-        color: #4A4A4A;
-    }
-    
-    /* Custom styling for chat messages */
-    .stChatMessage {
-        border-radius: 12px !important;
-        padding: 12px !important;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
-        margin-bottom: 14px !important;
-    }
-    
-    /* Add some spacing and styling */
-    .stTextInput > div > div > input {
-        border-radius: 8px !important;
-        border: 1px solid #E0E0E0 !important;
-        padding: 10px 14px !important;
-        font-size: 15px !important;
-    }
-    
-    /* Style the chat input box */
-    .stChatInputContainer {
-        padding-top: 18px !important;
-        border-top: 1px solid #f0f0f0 !important;
-        margin-top: 20px !important;
-    }
-    
-    /* Footer copyright styling */
-    .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        text-align: center;
-        padding: 12px 0;
-        background-color: white;
-        font-size: 13px;
-        color: #888;
-        border-top: 1px solid #f0f0f0;
-        z-index: 999;
-    }
-    
-    /* Add some breathing room */
-    .main-container {
-        max-width: 900px !important;
-        padding: 0 20px !important;
-        margin: 0 auto !important;
-    }
-    
-    /* Button styling */
-    .stButton button {
-        border-radius: 6px !important;
-        font-weight: 500 !important;
-        transition: all 0.2s ease !important;
-    }
-    
-    /* Sidebar refinements */
-    .css-1d391kg, .css-163ttbj {
-        background-color: #fafafa !important;
-    }
-    
-    /* Modern scrollbar */
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-    }
-    </style>
-    """
-    st.markdown(custom_css, unsafe_allow_html=True)
-    st.markdown("<div class='footer'>© 2025 Cl3vr AI. All rights reserved.</div>", unsafe_allow_html=True)
     
 def process_file(upload_file):
     with st.sidebar.expander("File contents"):
@@ -196,10 +57,12 @@ def process_file(upload_file):
         st.sidebar.write('unknown file type', filetype)
 
 def start_chat(container=st):
-    st.markdown("<h1 class='app-title' style='color: #87CEEB; font-size: 3.5rem;'>Cl3vr</h1>", unsafe_allow_html=True)
-    st.markdown("<div class='section-title'>Your AI assistant for Sales Compensation</div>", unsafe_allow_html=True)
-    st.markdown("<div class='section-subtitle'>Get instant answers to your sales compensation questions, design comp plans or SPIFs, analyze performance data, and streamline your workflows—all with with AI-powered assistance.</div>", unsafe_allow_html=True)
-    
+    st.title("Cl3vr")
+    st.subheader("Your AI assistant for Sales Compensation")
+    st.markdown("Get instant answers to your sales compensation questions, design comp plans or SPIFs, analyze performance data, and streamline your workflows—all with with AI-powered assistance.")
+    #st.markdown("© 2025 Cl3vr AI. All rights reserved.")
+    st.markdown("<br>", unsafe_allow_html=True)
+
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
@@ -272,8 +135,9 @@ def start_chat(container=st):
                             placeholder.markdown(full_response.replace("$", "\\$"))
                     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
+
 if __name__ == '__main__':
     st.set_page_config(page_title="Cl3vr - Your AI assistant for Sales Compensation")
     initialize_prompts()
-    set_custom_font()
+    #set_custom_font()
     start_chat()
