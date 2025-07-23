@@ -124,8 +124,10 @@ def start_chat(container=st):
                 
                 if resp := v.get("responseToUser"):
                     with st.chat_message("assistant"):
-                        st.write(resp) 
-                        st.session_state.messages.append({"role": "assistant", "content": resp})
+                        # Clean up response: remove weird line breaks
+                        cleaned_resp = resp.replace('\n', ' ').replace('  ', ' ')
+                        st.markdown(cleaned_resp, unsafe_allow_html=True)
+                        st.session_state.messages.append({"role": "assistant", "content": cleaned_resp})
                 
                 if resp := v.get("incrementalResponse"):
                     with st.chat_message("assistant"):
@@ -139,5 +141,4 @@ def start_chat(container=st):
 if __name__ == '__main__':
     st.set_page_config(page_title="Cl3vr - Your AI assistant for Sales Compensation")
     initialize_prompts()
-    #set_custom_font()
     start_chat()
