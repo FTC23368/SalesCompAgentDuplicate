@@ -73,7 +73,10 @@ def start_chat(container=st):
     for message in st.session_state.messages:
         if message["role"] != "system":
             with st.chat_message(message["role"]):
-                st.markdown(message["content"].replace("$", "\\$")) 
+                display_text = message["content"].replace("$", "\\$")
+                display_text = display_text.replace("\\\\$", "\\$")
+                st.markdown(display_text)
+                #st.markdown(message["content"].replace("$", "\\$")) 
     
     if prompt := st.chat_input("Ask me anything related to sales comp..", accept_file=True, file_type=["pdf", "md", "doc", "csv"]):
         if prompt and prompt["files"]:
@@ -134,7 +137,10 @@ def start_chat(container=st):
                         placeholder = st.empty()
                         for response in resp:
                             full_response = full_response + response.content
-                            placeholder.markdown(full_response.replace("$", "\\$"))
+                            display_text = full_response.replace("$", "\\$")
+                            display_text = display_text.replace("\\\$", "\\$")
+                            placeholder.markdown(display_text)
+                            #placeholder.markdown(full_response.replace("$", "\\$"))
                     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 
