@@ -20,6 +20,7 @@ from src.feedback_collector_agent import FeedbackCollectorAgent
 from src.create_llm_message import create_llm_msg
 from src.analytics_agent import AnalyticsAgent
 from src.research_agent import ResearchAgent
+from src.plan_design_agent import PlanDesignAgent
 from src.prompt_store import get_prompt
 
 class AgentState(TypedDict):
@@ -38,7 +39,7 @@ class AgentState(TypedDict):
 class Category(BaseModel):
     category: str
 
-VALID_CATEGORIES = ["policy", "commission", "contest", "ticket", "smalltalk", "clarify", "planexplainer", "feedbackcollector", "analytics"]
+VALID_CATEGORIES = ["policy", "commission", "contest", "ticket", "smalltalk", "clarify", "planexplainer", "feedbackcollector", "analytics", "plandesign"]
 
 class salesCompAgent():
     def __init__(self, api_key, embedding_model):
@@ -63,6 +64,7 @@ class salesCompAgent():
         self.clarify_agent_class = ClarifyAgent(self.model) # Capable of passing reference to the main agent
         self.small_talk_agent_class = SmallTalkAgent(self.client, self.model)
         self.plan_explainer_agent_class = PlanExplainerAgent(self.client, self.model, self.index, embedding_model)
+        self.plan_design_agent_class = PlanDesignAgent(self.client, self.model, self.index, embedding_model)
         self.feedback_collector_agent_class = FeedbackCollectorAgent(self.model)
         self.analytics_agent_class = AnalyticsAgent(self.model)
         self.research_agent_class = ResearchAgent(self.client, self.model)
@@ -76,6 +78,7 @@ class salesCompAgent():
         workflow.add_node("clarify", self.clarify_agent_class.clarify_agent)
         workflow.add_node("smalltalk", self.small_talk_agent_class.small_talk_agent)
         workflow.add_node("planexplainer", self.plan_explainer_agent_class.plan_explainer_agent)
+        workflow.add_node("plandesign", self.plan_design_agent_class.plan_design_agent)
         workflow.add_node("feedbackcollector", self.feedback_collector_agent_class.feedback_collector_agent)
         workflow.add_node("analytics", self.analytics_agent_class.analytics_agent)
         workflow.add_node("research", self.research_agent_class.research_agent)
@@ -89,6 +92,7 @@ class salesCompAgent():
         workflow.add_edge("clarify", END)
         workflow.add_edge("smalltalk", END)
         workflow.add_edge("planexplainer", END)
+        workflow.add_edge("plandesign", END)
         workflow.add_edge("feedbackcollector", END)
         workflow.add_edge("analytics", END)
         workflow.add_edge("research", END)

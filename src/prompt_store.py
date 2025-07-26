@@ -663,6 +663,7 @@ def get_prompt_code(prompt_name, user="default"):
         "ticket": TICKET_PROMPT,
         "ticketemail": TICKET_EMAIL_PROMPT,
         "analytics": ANALYTICS_PROMPT,
+        "plandesign": PLAN_DESIGN_PROMPT,
     }
 
     prompt_text = prompt_mapping.get(prompt_name, f"Missing Prompt: {prompt_name}")
