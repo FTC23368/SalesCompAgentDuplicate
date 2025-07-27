@@ -70,14 +70,14 @@ comp plan works, even if the word "plan" is not mentioned.
 
 10) **clarify**: Select this category if the request is unclear, ambiguous, or does not fit into the above categories. 
 Ask the user for more details.
-    - Example: "I'm not happy with my compensation plan"
-    - Example: "Something is wrong with my commission"
-    - Example: "I need help with sales compensation"
-    - Example: "Can you explain how this works?"
-    - Example: "I have a question about my pay"
-    - Example: "There's an issue I need to discuss"
-    - Example: "I want to understand my situation better"
-    - Example: "Can you help me figure this out?"
+    - Example: "I'm not happy with my compensation plan." (This is about clarify.)
+    - Example: "Something is wrong with my commission." (This is about clarify.)
+    - Example: "I need help with sales compensation." (This is about clarify.)
+    - Example: "Can you explain how this works?" (This is about clarify.)
+    - Example: "I have a question about my pay." (This is about clarify.)
+    - Example: "There's an issue I need to discuss." (This is about clarify.)
+    - Example: "I want to understand my situation better." (This is about clarify.)
+    - Example: "Can you help me figure this out?" (This is about clarify.)
 
 Remember to consider the context and content of the request, even if specific keywords like 'policy' or 'commission' 
 are not used.
