@@ -14,53 +14,54 @@ def format_timestamp(timestamp):
     except:
         return timestamp  # Return original if conversion fails
 
-def main_code():
-    key_descriptions = {
-        "is_logged_in": "Indicates if the user is currently logged in.",
-        "iss": "Issuer Identifier for the issuer of the response.",
-        "azp": "Authorized party - the party to which the ID Token was issued.",
-        "aud": "Audience - the party for which the ID Token is intended.",
-        "sub": "Subject - an identifier for the user, unique among all Google accounts.",
-        "email": "The user's email address.",
-        "email_verified": "Indicates if the user's email address has been verified.",
-        "at_hash": "Access token hash for validating the token.",
-        "nonce": "A unique value to associate a client session with an ID Token.",
-        "name": "The user's full name.",
-        "picture": "URL of the user's profile picture.",
-        "given_name": "The user's given name.",
-        "family_name": "The user's family name.",
-        "iat": "Issued At Time - the time the ID Token was issued.",
-        "exp": "Expiration Time - the time the ID Token expires."
-    }
+def ui_not_logged_in():
+    st.title("Sales Comp Agent")
+    if st.button("Log in with Google", type="primary", icon=":material/login:"):
+        st.login()
 
-    # Create a list of dictionaries for the DataFrame
-    data = []
-    for key, value in st.experimental_user.items():
-        if key in ["iat", "exp"]:
-            value = format_timestamp(value)  # Convert timestamps to human-readable format
-        description = key_descriptions.get(key, "No description available.")
-        data.append({"Key": key, "Value": value, "Description": description})
-    df = pd.DataFrame(data)
-    with st.expander("Key Descriptions", expanded=False):
-        #st.html(f"Hello, <span style='color: orange; font-weight: bold;'>{st.experimental_user.name}</span>!")
-        st.subheader("User Information", divider=True)
-        st.dataframe(df, height=600, hide_index=True)
 
-print(f"{st.context.headers=}")
-config_auth_needed=st.secrets.get("AUTH_NEEDED","True").lower()=="true"
 
-auth_needed=config_auth_needed and not st.experimental_user.is_logged_in
+
+
+#print(f"{st.context.headers=}")
+#config_auth_needed=st.secrets.get("AUTH_NEEDED","True").lower()=="true"
+
+#auth_needed=config_auth_needed and not st.user.is_logged_in
 #col1, col2 = st.columns([4,1])
 
 
-if auth_needed:
-    st.title("Sales Comp Agent")
-    if st.sidebar.button("Log in with Google", type="primary", icon=":material/login:"):
-        st.login()
-else:
+#if auth_needed:
+#    ui_not_logged_in()
+#else:
     # Display user name
     #main_code()
+#    initialize_prompts()
+#    start_chat()
+    #st.sidebar.json(st.user)
+#    st.sidebar.write(f"{st.user.get('name')}")
+#    if st.sidebar.button("Log out", type="secondary", icon=":material/logout:"):
+#        st.logout()
+def chat_ui():
     initialize_prompts()
     start_chat()
-    if st.sidebar.button("Log out", type="secondary", icon=":material/logout:"):
-        st.logout()
+
+def logout_user():
+    st.logout()
+
+def ui_with_pagenation():
+    if st.user and st.user.is_logged_in:
+        st.sidebar.write(f"{st.user.get('name')}")
+    config_auth_needed=st.secrets.get("AUTH_NEEDED","True").lower()=="true"
+    auth_needed=config_auth_needed and not st.user.is_logged_in
+    pages = {
+        "home": [st.Page(chat_ui, title="chat")],
+    }
+    if auth_needed:
+        pages["login"] = [st.Page(ui_not_logged_in, title="login")]
+    else:
+        pages["logout"] = [st.Page(logout_user, title="logout")]
+
+    pg = st.navigation(pages, position="top")
+    pg.run()
+
+ui_with_pagenation()
