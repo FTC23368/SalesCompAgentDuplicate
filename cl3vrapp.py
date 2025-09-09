@@ -65,7 +65,7 @@ def start_chat(container=st):
 </div>
 """, unsafe_allow_html=True)
     st.subheader("Your AI assistant for Sales Compensation")
-    st.markdown("Get instant answers to your sales compensation questions, design comp plans or SPIFs, analyze performance data, and streamline your workflows—all with with AI-powered assistance.")
+    st.markdown("Get instant answers to your sales compensation questions, design comp plans or SPIFs, analyze performance data, and streamline your workflows—all with AI-powered assistance.")
     #st.markdown("© 2025 Cl3vr AI. All rights reserved.")
     st.markdown("<br>", unsafe_allow_html=True)
 
