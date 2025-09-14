@@ -5,6 +5,7 @@ slack_sdk
 openai
 pydantic
 Authlib
+supabase
 
 
 langchain

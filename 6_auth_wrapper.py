@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 from datetime import datetime
 from cl3vrapp import initialize_prompts, start_chat
+from src.supabase_integration import get_supabase_client, get_user_from_db, get_conv_from_db
 
 def format_timestamp(timestamp):
     try:
@@ -10,8 +11,24 @@ def format_timestamp(timestamp):
     except:
         return timestamp 
 
+def add_user_info_to_session_state():
+    email_address = st.user.get("email")
+    if email_address:
+        supabase = get_supabase_client()
+        user_record = get_user_from_db(supabase, email_address)
+        if user_record:
+            st.session_state.user_record = user_record
+        else:
+            st.warning(f"Sorry, record not found for {email_address}. Please contact support")
+    else:
+        st.warning(f"Sorry, record not found for {email_address}. Please contact support")
+
+
 def ui_not_logged_in():
     st.login()
+    
+def show_conv_history(conv_history):
+    st.sidebar.write(f"{conv_history=}")
 
 def chat_ui():
     initialize_prompts()
@@ -22,7 +39,23 @@ def logout_user():
 
 def ui_with_pagenation():
     if st.user and st.user.is_logged_in:
+        #with st.sidebar.expander("account information"):
+        #    st.write(st.session_state)
         st.sidebar.write(f"{st.user.get('name')}")
+        user_record = st.session_state.get("user_record")
+
+        if not user_record:
+            add_user_info_to_session_state()
+            user_record = st.session_state.get("user_record")
+        
+        if user_record:
+            account_name = user_record.get("account_name")
+            st.sidebar.write(f"{account_name}")
+            account_id = user_record.get("account_id")
+            supabase = get_supabase_client()
+            conv_history = get_conv_from_db(supabase, account_id)
+            show_conv_history(conv_history)
+
     config_auth_needed=st.secrets.get("AUTH_NEEDED","True").lower()=="true"
     auth_needed=config_auth_needed and not st.user.is_logged_in
     pages = [st.Page(chat_ui, title="Home")]
@@ -30,6 +63,7 @@ def ui_with_pagenation():
     if auth_needed:
         pages.append(st.Page(ui_not_logged_in, title="Login"))
     else:
+        #print(f"{st.user.to_dict()}")
         pages.append(st.Page(logout_user, title="Logout"))
     
     pg = st.navigation(pages, position="top")
