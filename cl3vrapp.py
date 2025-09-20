@@ -89,6 +89,7 @@ def restore_conv_history_to_ui(conv_id, conv):
     st.session_state.messages = messages
     st.rerun()
     
+    
 
 def start_chat(container=st):
     #st.title("Cl3vr")
@@ -133,7 +134,8 @@ def start_chat(container=st):
         if conv_history:
             for conv in conv_history:
                 conv_id = conv.get('thread_id')
-                conv_name = f"{conv.get('thread_id')}"
+                short_title = conv.get('short_title')
+                conv_name = short_title or f"{conv.get('thread_id')}"
                 if st.sidebar.button(conv_name, type="tertiary", key=conv_name):
                     #st.error("to do")
                     r = conv['conv']
