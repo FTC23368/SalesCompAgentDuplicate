@@ -4,10 +4,11 @@ import PyPDF2
 import random
 import streamlit as st
 from src.graph import salesCompAgent
+from langchain_groq import ChatGroq
 from src.google_firestore_integration import get_all_prompts
 from google.oauth2 import service_account
 from langchain_core.messages import HumanMessage, AIMessage
-from src.conv_history import message_history_to_string, string_to_message_history
+from src.conv_history import message_history_to_string, string_to_message_history, get_short_conv_title
 from src.supabase_integration import get_supabase_client, upsert_conv_history, get_conv_history_for_user
 
 os.environ["LANGCHAIN_TRACING_V2"]="true"
@@ -61,6 +62,8 @@ def process_file(upload_file):
 
 def save_conv_history_to_db(thread_id):
     msgs = st.session_state.messages
+    
+
     user_record = st.session_state.get('user_record', DEFAULT_USER_RECORD)
     #st.sidebar.json(user_record)
     new_record = {
@@ -68,6 +71,14 @@ def save_conv_history_to_db(thread_id):
         "thread_id": thread_id,
         "conv": message_history_to_string(msgs),
     }
+
+    if len(msgs) <= 2:
+        client = ChatGroq(model=st.secrets['GROQ_MODEL'], temperature=0, api_key=st.secrets['GROQ_API_KEY'])
+        summary = get_short_conv_title(client, msgs)
+        new_record["short_title"] = summary
+        st.sidebar.write(f"summary is {summary}")
+
+
     supabase = get_supabase_client()
     upsert_conv_history(supabase, new_record)
     st.sidebar.success("save_to_db")
@@ -206,6 +217,7 @@ def start_chat(container=st):
                             placeholder.markdown(display_text)
                             #placeholder.markdown(full_response.replace("$", "\\$"))
                     st.session_state.messages.append({"role": "assistant", "content": full_response})
+                    
                     save_conv_history_to_db(thread_id)
 
 
