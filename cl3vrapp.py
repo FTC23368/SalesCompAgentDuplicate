@@ -62,7 +62,7 @@ def process_file(upload_file):
 def save_conv_history_to_db(thread_id):
     msgs = st.session_state.messages
     user_record = st.session_state.get('user_record', DEFAULT_USER_RECORD)
-    st.sidebar.json(user_record)
+    #st.sidebar.json(user_record)
     new_record = {
         "user_id": user_record["id"],
         "thread_id": thread_id,
@@ -70,7 +70,13 @@ def save_conv_history_to_db(thread_id):
     }
     supabase = get_supabase_client()
     upsert_conv_history(supabase, new_record)
+    st.sidebar.success("save_to_db")
 
+def restore_conv_history_to_ui(conv_id, conv):
+    st.session_state.thread_id = conv_id
+    messages = string_to_message_history(conv)
+    st.session_state.messages = messages
+    st.rerun()
     
 
 def start_chat(container=st):
@@ -106,12 +112,24 @@ def start_chat(container=st):
     #st.sidebar.write(f"{thread_id=}")
     user_record = st.session_state.get('user_record')
     supabase = get_supabase_client()
+    #with st.sidebar.expander('session_state'):
+        #st.json(st.session_state)
     if user_record:
         user_id = user_record.get('id', 0)
+        #st.write(f"{user_id=}")
         conv_history = get_conv_history_for_user(supabase, user_id)
+
         if conv_history:
-            conv_records = conv_history.get("conv")
-            st.sidebar.write(conv_records)
+            for conv in conv_history:
+                conv_id = conv.get('thread_id')
+                conv_name = f"{conv.get('thread_id')}"
+                if st.sidebar.button(conv_name, type="tertiary", key=conv_name):
+                    #st.error("to do")
+                    r = conv['conv']
+                    restore_conv_history_to_ui(conv_id, r)
+
+
+
 
 
 
@@ -176,7 +194,7 @@ def start_chat(container=st):
                         cleaned_resp = resp.replace('\n', ' ').replace('  ', ' ')
                         st.markdown(cleaned_resp, unsafe_allow_html=True)
                         st.session_state.messages.append({"role": "assistant", "content": cleaned_resp})
-                        save_conv_history_to_db()
+                        save_conv_history_to_db(thread_id)
                 
                 if resp := v.get("incrementalResponse"):
                     with st.chat_message("assistant"):

@@ -28,7 +28,8 @@ def ui_not_logged_in():
     st.login()
     
 def show_conv_history(conv_history):
-    st.sidebar.write(f"{conv_history=}")
+    #st.sidebar.write(f"{conv_history=}")
+    pass
 
 def chat_ui():
     initialize_prompts()
@@ -50,10 +51,11 @@ def ui_with_pagenation():
         
         if user_record:
             account_name = user_record.get("account_name")
-            st.sidebar.write(f"{account_name}")
-            account_id = user_record.get("account_id")
+            #st.sidebar.write(f"{account_name}")
+            user_id = user_record.get("id")
+            #st.sidebar.write(f"{user_id=}")
             supabase = get_supabase_client()
-            conv_history = get_conv_from_db(supabase, account_id)
+            conv_history = get_conv_from_db(supabase, user_id)
             show_conv_history(conv_history)
 
     config_auth_needed=st.secrets.get("AUTH_NEEDED","True").lower()=="true"

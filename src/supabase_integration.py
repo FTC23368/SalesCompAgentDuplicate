@@ -29,13 +29,13 @@ def get_user_from_db(_supabase, login):
         print(f"Error fetching user from database: {e}")
         return None
 
-def get_conv_from_db(_supabase, account_id):
+def get_conv_from_db(_supabase, user_id):
     """Fetches user details from the 'users' table based on email."""
     supabase=_supabase
     if not supabase:
         return None
     try:
-        response = supabase.table('conv_history').select('*').eq('account_id', account_id).execute()
+        response = supabase.table('conv_history').select('*').eq('user_id', user_id).execute()
         if response.data:
             return response.data
         return None
@@ -52,7 +52,7 @@ def upsert_conv_history(_supabase, new_record):
     try:
         response = supabase.table('conv_history').select('*').eq('user_id', user_id).eq('thread_id', thread_id).execute()
         if len(response.data) > 0:
-            st.sidebar.json(response.data)
+            #st.sidebar.json(response.data)
             row_id = response.data[0].get("id")
             supabase.table("conv_history").update({'conv': new_conv}).eq("id", row_id).execute()
         else:
@@ -69,7 +69,7 @@ def get_conv_history_for_user(_supabase, user_id):
     try:
         response = supabase.table("conv_history").select('*').eq('user_id', user_id).execute()
         if response:
-            return response.data[0]
+            return response.data
         else:
             return None
 
