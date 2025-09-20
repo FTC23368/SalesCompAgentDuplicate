@@ -53,11 +53,11 @@ def upsert_conv_history(_supabase, new_record):
         response = supabase.table('conv_history').select('*').eq('user_id', user_id).eq('thread_id', thread_id).execute()
         if len(response.data) > 0:
             #st.sidebar.json(response.data)
-            st.sidebar.write(f"update {new_record=}")
+            #st.sidebar.write(f"update {new_record=}")
             row_id = response.data[0].get("id")
             supabase.table("conv_history").update({'conv': new_conv}).eq("id", row_id).execute()
         else:
-            st.sidebar.write(f"insert {new_record=}")
+            #st.sidebar.write(f"insert {new_record=}")
             supabase.table("conv_history").insert(new_record).execute()
 
     except Exception as e:

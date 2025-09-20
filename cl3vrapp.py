@@ -76,12 +76,12 @@ def save_conv_history_to_db(thread_id):
         client = ChatGroq(model=st.secrets['GROQ_MODEL'], temperature=0, api_key=st.secrets['GROQ_API_KEY'])
         summary = get_short_conv_title(client, msgs)
         new_record["short_title"] = summary
-        st.sidebar.write(f"summary is {summary}")
+        #st.sidebar.write(f"summary is {summary}")
 
 
     supabase = get_supabase_client()
     upsert_conv_history(supabase, new_record)
-    st.sidebar.success("save_to_db")
+    #st.sidebar.success("save_to_db")
 
 def restore_conv_history_to_ui(conv_id, conv):
     st.session_state.thread_id = conv_id
