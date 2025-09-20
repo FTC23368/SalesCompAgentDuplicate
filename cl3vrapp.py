@@ -7,6 +7,8 @@ from src.graph import salesCompAgent
 from src.google_firestore_integration import get_all_prompts
 from google.oauth2 import service_account
 from langchain_core.messages import HumanMessage, AIMessage
+from src.conv_history import message_history_to_string, string_to_message_history
+from src.supabase_integration import get_supabase_client, upsert_conv_history, get_conv_history_for_user
 
 os.environ["LANGCHAIN_TRACING_V2"]="true"
 os.environ["LANGCHAIN_API_KEY"]=st.secrets['LANGCHAIN_API_KEY']
@@ -15,6 +17,7 @@ os.environ['LANGCHAIN_ENDPOINT']="https://api.smith.langchain.com"
 os.environ['SENDGRID_API_KEY']=st.secrets['SENDGRID_API_KEY']
 
 DEBUGGING=0
+DEFAULT_USER_RECORD = {'id': 100000}
 
 def get_google_cloud_credentials():
     # Get Google Cloud credentials from Streamlit secrets
@@ -56,6 +59,20 @@ def process_file(upload_file):
     else:
         st.sidebar.write('unknown file type', filetype)
 
+def save_conv_history_to_db(thread_id):
+    msgs = st.session_state.messages
+    user_record = st.session_state.get('user_record', DEFAULT_USER_RECORD)
+    st.sidebar.json(user_record)
+    new_record = {
+        "user_id": user_record["id"],
+        "thread_id": thread_id,
+        "conv": message_history_to_string(msgs),
+    }
+    supabase = get_supabase_client()
+    upsert_conv_history(supabase, new_record)
+
+    
+
 def start_chat(container=st):
     #st.title("Cl3vr")
     st.markdown("""
@@ -72,9 +89,31 @@ def start_chat(container=st):
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    if "thread-id" not in st.session_state:
-        st.session_state.thread_id = random.randint(1000, 9999)
+    if "thread_id" not in st.session_state:
+        st.session_state.thread_id = random.randint(1000, 100000000)
     thread_id = st.session_state.thread_id
+
+    #json_str = message_history_to_string(st.session_state.messages)
+    #with st.sidebar.expander("json_str"):
+    #    st.write(json_str)
+
+    #with st.sidebar.expander("json_object"):
+    #    jo = string_to_message_history(json_str)
+    #    for message in jo:
+    #        role = message["role"]
+    #        content = message["content"]
+    #        st.write(f"{role=}, {content=}")
+    #st.sidebar.write(f"{thread_id=}")
+    user_record = st.session_state.get('user_record')
+    supabase = get_supabase_client()
+    if user_record:
+        user_id = user_record.get('id', 0)
+        conv_history = get_conv_history_for_user(supabase, user_id)
+        if conv_history:
+            conv_records = conv_history.get("conv")
+            st.sidebar.write(conv_records)
+
+
 
     for message in st.session_state.messages:
         if message["role"] != "system":
@@ -137,6 +176,7 @@ def start_chat(container=st):
                         cleaned_resp = resp.replace('\n', ' ').replace('  ', ' ')
                         st.markdown(cleaned_resp, unsafe_allow_html=True)
                         st.session_state.messages.append({"role": "assistant", "content": cleaned_resp})
+                        save_conv_history_to_db()
                 
                 if resp := v.get("incrementalResponse"):
                     with st.chat_message("assistant"):
@@ -148,6 +188,7 @@ def start_chat(container=st):
                             placeholder.markdown(display_text)
                             #placeholder.markdown(full_response.replace("$", "\\$"))
                     st.session_state.messages.append({"role": "assistant", "content": full_response})
+                    save_conv_history_to_db(thread_id)
 
 
 if __name__ == '__main__':
