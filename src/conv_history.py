@@ -1,5 +1,5 @@
 import json
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from langchain_core.messages import SystemMessage, HumanMessage
 
 def message_history_to_string(msgs):
     new_str = json.dumps(msgs)

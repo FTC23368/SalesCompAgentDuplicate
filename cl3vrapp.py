@@ -62,8 +62,6 @@ def process_file(upload_file):
 
 def save_conv_history_to_db(thread_id):
     msgs = st.session_state.messages
-    
-
     user_record = st.session_state.get('user_record', DEFAULT_USER_RECORD)
     #st.sidebar.json(user_record)
     new_record = {
@@ -71,6 +69,8 @@ def save_conv_history_to_db(thread_id):
         "thread_id": thread_id,
         "conv": message_history_to_string(msgs),
     }
+
+
 
     if len(msgs) <= 2:
         client = ChatGroq(model=st.secrets['GROQ_MODEL'], temperature=0, api_key=st.secrets['GROQ_API_KEY'])
@@ -89,16 +89,14 @@ def restore_conv_history_to_ui(conv_id, conv):
     st.session_state.messages = messages
     st.rerun()
     
-    
-
 def start_chat(container=st):
     #st.title("Cl3vr")
     st.markdown("""
-<div style="display:flex;align-items:center;gap:2px;margin:0 0 0.25rem 0;">
-  <h1 style="margin:0;">Cl3vr</h1>
-  <span style="background:#f59e0b;color:white;border-radius:999px;padding:2px 8px;font-size:0.8rem;font-weight:700;">BETA</span>
-</div>
-""", unsafe_allow_html=True)
+    <div style="display:flex;align-items:center;gap:2px;margin:0 0 0.25rem 0;">
+    <h1 style="margin:0;">Cl3vr</h1>
+    <span style="background:#f59e0b;color:white;border-radius:999px;padding:2px 8px;font-size:0.8rem;font-weight:700;">BETA</span>
+    </div>
+    """, unsafe_allow_html=True)
     st.subheader("Your AI assistant for Sales Compensation")
     st.markdown("Get instant answers to your sales compensation questions, design comp plans or SPIFs, analyze performance data, and streamline your workflows—all with AI-powered assistance.")
     #st.markdown("© 2025 Cl3vr AI. All rights reserved.")
@@ -140,10 +138,6 @@ def start_chat(container=st):
                     #st.error("to do")
                     r = conv['conv']
                     restore_conv_history_to_ui(conv_id, r)
-
-
-
-
 
 
     for message in st.session_state.messages:
@@ -221,7 +215,6 @@ def start_chat(container=st):
                     st.session_state.messages.append({"role": "assistant", "content": full_response})
                     
                     save_conv_history_to_db(thread_id)
-
 
 if __name__ == '__main__':
     st.set_page_config(page_title="Cl3vr - Your AI assistant for Sales Compensation")

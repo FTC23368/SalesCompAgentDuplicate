@@ -65,7 +65,6 @@ def upsert_conv_history(_supabase, new_record):
         print(f"Error upserting conversation history from database: {e}")
         return None
 
-
 def get_conv_history_for_user(_supabase, user_id):
     supabase = _supabase
     try:
@@ -80,7 +79,6 @@ def get_conv_history_for_user(_supabase, user_id):
         print(f"Error getting conversation history from database: {e}")
         return None
 
-
 def get_all_users_from_db(_supabase):
     """Fetches user details from the 'users' table based on email."""
     supabase=_supabase
@@ -94,6 +92,17 @@ def get_all_users_from_db(_supabase):
     except Exception as e:
         st.error(f"Error fetching user from database: {e}")
         print(f"Error fetching user from database: {e}")
+        return None
+
+def insert_docs(_supabase, new_record):
+    supabase=_supabase
+
+    try:
+        supabase.table("docs").insert(new_record).execute()
+
+    except Exception as e:
+        st.error(f"Error upserting docs into database: {e}")
+        print(f"Error upserting docs into database: {e}")
         return None
 
 if __name__ == '__main__':
