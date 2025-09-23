@@ -20,7 +20,6 @@ def pdf_to_text(uploaded_file):
 
 def md_to_text(uploaded_file):
     return uploaded_file.getvalue().decode('utf-8')
-
     
 def upload_file(org_id: int, account_id: int, file_bytes: bytes, filename: str, file_type: str, doc_category: list, doc_name: str):
     params = {
@@ -35,13 +34,13 @@ def upload_file(org_id: int, account_id: int, file_bytes: bytes, filename: str, 
     supabase = get_supabase_client()
     insert_docs(supabase, params)
 
-if __name__ == '__main__':
-    
-    # Section 1: Direct Text Input
+def ui_for_upload_docs():
     org_id = st.number_input("org_id", min_value=1000, step=1, format="%i")
     account_id = st.number_input("account_id", min_value=1000, step=1, format="%i")
     doc_category=st.pills("Select the category that applies", ["Policy", "Product", "Other"])
     doc_name=st.text_input("Document Name",value="")
+    
+    # Section 1: Direct Text Input
     st.markdown("# Upload text directly")
     uploaded_text = st.text_area("Enter Text","")
     if st.button('Process and Upload Text'):
@@ -61,3 +60,7 @@ if __name__ == '__main__':
                 # Read markdown file directly as text
                 file_text = md_to_text(uploaded_file)
             upload_file(org_id, account_id, file_text, uploaded_file.name, uploaded_file.type, doc_category, doc_name)
+
+
+if __name__ == '__main__':
+    ui_for_upload_docs() 
