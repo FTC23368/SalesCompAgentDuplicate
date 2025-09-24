@@ -22,6 +22,7 @@ from src.analytics_agent import AnalyticsAgent
 from src.research_agent import ResearchAgent
 from src.plan_design_agent import PlanDesignAgent
 from src.prompt_store import get_prompt
+from src.supabase_integration import get_supabase_client, get_user_from_db
 
 class AgentState(TypedDict):
     agent: str
@@ -57,7 +58,14 @@ class salesCompAgent():
         self.pinecone = Pinecone(api_key=self.pinecone_api_key)
         self.index = self.pinecone.Index(self.pinecone_index_name)
 
-        self.policy_agent_class = PolicyAgent(self.client, self.model, self.index, embedding_model)
+        self.supabase_client = get_supabase_client()
+        self.user_record = {}
+        if st.session_state.get("user_record"):
+            self.user_record = st.session_state.user_record
+
+
+
+        self.policy_agent_class = PolicyAgent(self.client, self.model, self.index, embedding_model, self.supabase_client, self.user_record)
         self.commission_agent_class = CommissionAgent(self.model)
         self.contest_agent_class = ContestAgent(self.client, self.model, self.index, embedding_model)
         self.ticket_agent_class = TicketAgent(self.model)

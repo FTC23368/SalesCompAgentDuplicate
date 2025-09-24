@@ -104,6 +104,22 @@ def insert_docs(_supabase, new_record):
         st.error(f"Error upserting docs into database: {e}")
         print(f"Error upserting docs into database: {e}")
         return None
+        
+
+def get_docs(_supabase, account_id, doc_category):
+    supabase=_supabase
+
+    try:
+        response = supabase.table("docs").select('*').eq("account_id", account_id).eq("doc_category", doc_category).execute()
+        if response.data:
+            return response.data
+        return None
+
+
+    except Exception as e:
+        st.error(f"Error getting docs from database: {e}")
+        print(f"Error getting docs from database: {e}")
+        return None
 
 if __name__ == '__main__':
     supabase = get_supabase_client()

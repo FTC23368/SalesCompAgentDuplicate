@@ -27,7 +27,7 @@ def upload_file(org_id: int, account_id: int, file_bytes: bytes, filename: str, 
         "account_id": account_id,
         "doc_category": doc_category,
         "doc_contents": file_bytes,
-        "doc_src": file_bytes,
+        #"doc_src": file_bytes,
         "doc_title": doc_name,
     }
     st.sidebar.json(params)

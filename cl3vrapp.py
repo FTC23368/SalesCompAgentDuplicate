@@ -130,11 +130,13 @@ def start_chat(container=st):
         conv_history = get_conv_history_for_user(supabase, user_id)
 
         if conv_history:
-            for conv in conv_history:
+            for idx, conv in enumerate(conv_history):
                 conv_id = conv.get('thread_id')
                 short_title = conv.get('short_title')
                 conv_name = short_title or f"{conv.get('thread_id')}"
-                if st.sidebar.button(conv_name, type="tertiary", key=conv_name):
+                conv_key = conv_name + f"{idx}"
+
+                if st.sidebar.button(conv_name, type="tertiary", key=conv_key):
                     #st.error("to do")
                     r = conv['conv']
                     restore_conv_history_to_ui(conv_id, r)
