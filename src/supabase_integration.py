@@ -65,6 +65,80 @@ def upsert_conv_history(_supabase, new_record):
         print(f"Error upserting conversation history from database: {e}")
         return None
 
+def add_org(_supabase, new_record):
+    supabase = _supabase
+    try:
+        response = supabase.table('orgs').insert(new_record).execute()
+        if response.data:
+            return response.data
+        else:
+            st.warning("Insert succeeded but no data returned")
+            return None
+    
+    except Exception as e:
+        st.error(f"Error inserting org into database: {e}")
+        print(f"Error inserting org into database: {e}")
+        return None
+
+def add_account(_supabase, new_record):
+    supabase = _supabase
+    try:
+        response = supabase.table('accounts').insert(new_record).execute()
+        if response.data:
+            return response.data
+        else:
+            st.warning("Insert succeeded but no data returned")
+            return None
+    
+    except Exception as e:
+        st.error(f"Error adding account into database: {e}")
+        print(f"Error adding account into database: {e}")
+        return None
+
+def add_user(_supabase, new_record):
+    supabase = _supabase
+    try:
+        response = supabase.table('users').insert(new_record).execute()
+        if response.data:
+            return response.data
+        else:
+            st.warning("Insert succeeded but no data returned")
+            return None
+    
+    except Exception as e:
+        st.error(f"Error adding user into database: {e}")
+        print(f"Error adding user into database: {e}")
+        return None
+
+def get_orgs(_supabase):
+    supabase = _supabase
+    try:
+        response = supabase.table("orgs").select("*").execute()
+        if response:
+            return response.data
+        else:
+            return None
+
+    except Exception as e:
+        st.error(f"Error getting orgs from database: {e}")
+        print(f"Error getting orgs from database: {e}")
+        return None
+
+def get_accounts(_supabase, org_id):
+    supabase = _supabase
+    try:
+        response = supabase.table("accounts").select("*").eq('org_id', org_id).execute()
+        if response:
+            return response.data
+        else:
+            return None
+
+    except Exception as e:
+        st.error(f"Error getting accounts from database: {e}")
+        print(f"Error getting accounts from database: {e}")
+        return None
+
+
 def get_conv_history_for_user(_supabase, user_id):
     supabase = _supabase
     try:

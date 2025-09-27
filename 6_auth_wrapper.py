@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 from datetime import datetime
 from cl3vrapp import initialize_prompts, start_chat
+from src.admin_pages import create_user, create_account, create_org
 from src.supabase_integration import get_supabase_client, get_user_from_db, get_conv_from_db
 
 def format_timestamp(timestamp):
@@ -38,6 +39,8 @@ def chat_ui():
 def logout_user():
     st.logout()
 
+
+
 def ui_with_pagenation():
     if st.user and st.user.is_logged_in:
         #with st.sidebar.expander("account information"):
@@ -54,6 +57,8 @@ def ui_with_pagenation():
             #st.sidebar.write(f"{account_name}")
             user_id = user_record.get("id")
             #st.sidebar.write(f"{user_id=}")
+            user_role = user_record.get("role", "guest")
+            st.sidebar.write(f"{user_role=}")
             supabase = get_supabase_client()
             conv_history = get_conv_from_db(supabase, user_id)
             show_conv_history(conv_history)
@@ -65,6 +70,12 @@ def ui_with_pagenation():
     if auth_needed:
         pages.append(st.Page(ui_not_logged_in, title="Login"))
     else:
+        if user_role and user_role == 'superadmin':
+            pages.append(st.Page(create_org, title="Create Org"))
+            pages.append(st.Page(create_account, title="Create Account"))
+            pages.append(st.Page(create_user, title="Create User"))
+
+        
         #print(f"{st.user.to_dict()}")
         pages.append(st.Page(logout_user, title="Logout"))
     
