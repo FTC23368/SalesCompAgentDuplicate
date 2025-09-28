@@ -40,13 +40,13 @@ def ui_for_upload_docs():
     orgs = get_orgs(supabase)
     org_names = [r.get('name') for r in orgs]
     org_map = {r.get('name'): r.get('id') for r in orgs}
-    option = st.selectbox("org", org_names)
+    option = st.selectbox("Organization Name", org_names)
     org_id = org_map.get(option, -1)
 
     accounts = get_accounts(supabase, org_id)
     account_names = [r.get('name') for r in accounts]
     account_map = {r.get('name'): r.get('id') for r in accounts}
-    option_account = st.selectbox("account", account_names)
+    option_account = st.selectbox("Account Name", account_names)
     account_id = account_map.get(option_account, -2)
 
     doc_category=st.pills("Select the category that applies", ["Policy", "Product", "Other"])
