@@ -64,6 +64,7 @@ def create_user():
     option_account = st.selectbox("account", account_names)
     account_id = account_map.get(option_account, -2)
 
+    user_login = None
     login_value = st.text_input("user login")
     if login_value:
         if is_valid_email(login_value):
@@ -71,8 +72,8 @@ def create_user():
         else:
             st.error("sorry, login needs to be a valid email address")
             user_login = None
-    user_name = st.text_input("user_name")
-    user_role = st.selectbox("role", ['guest', 'admin', 'superadmin'])
+    user_name = st.text_input("Full Name")
+    user_role = st.selectbox("role", ['user', 'guest', 'admin', 'superadmin'])
     auth_source = st.selectbox("auth_source", ["google"])
     ready_for_user = user_login and user_name and user_role and account_id > 0 and org_id > 0
     if ready_for_user and st.button("create user"):

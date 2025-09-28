@@ -1,5 +1,5 @@
 import PyPDF2
-from src.supabase_integration import get_supabase_client, insert_docs
+from src.supabase_integration import get_supabase_client, insert_docs, get_accounts, get_orgs
 import streamlit as st
 from streamlit.logger import get_logger
 from langchain.document_loaders import PyPDFLoader
@@ -35,8 +35,20 @@ def upload_file(org_id: int, account_id: int, file_bytes: bytes, filename: str, 
     insert_docs(supabase, params)
 
 def ui_for_upload_docs():
-    org_id = st.number_input("org_id", min_value=1000, step=1, format="%i")
-    account_id = st.number_input("account_id", min_value=1000, step=1, format="%i")
+    st.title("Document Loader")
+    supabase = get_supabase_client()
+    orgs = get_orgs(supabase)
+    org_names = [r.get('name') for r in orgs]
+    org_map = {r.get('name'): r.get('id') for r in orgs}
+    option = st.selectbox("org", org_names)
+    org_id = org_map.get(option, -1)
+
+    accounts = get_accounts(supabase, org_id)
+    account_names = [r.get('name') for r in accounts]
+    account_map = {r.get('name'): r.get('id') for r in accounts}
+    option_account = st.selectbox("account", account_names)
+    account_id = account_map.get(option_account, -2)
+
     doc_category=st.pills("Select the category that applies", ["Policy", "Product", "Other"])
     doc_name=st.text_input("Document Name",value="")
     
