@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 from datetime import datetime
 from cl3vrapp import initialize_prompts, start_chat
-from src.admin_pages import create_user, create_account, create_org
+from src.admin_pages import show_admin_page
 from src.supabase_integration import get_supabase_client, get_user_from_db, get_conv_from_db
 
 def format_timestamp(timestamp):
@@ -71,9 +71,7 @@ def ui_with_pagenation():
         pages.append(st.Page(ui_not_logged_in, title="Login"))
     else:
         if user_role and user_role == 'superadmin':
-            pages.append(st.Page(create_org, title="Create Org"))
-            pages.append(st.Page(create_account, title="Create Account"))
-            pages.append(st.Page(create_user, title="Create User"))
+            pages.append(st.Page(show_admin_page, title="Super Admin"))
 
         
         #print(f"{st.user.to_dict()}")
