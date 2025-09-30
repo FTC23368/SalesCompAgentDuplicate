@@ -91,12 +91,28 @@ def restore_conv_history_to_ui(conv_id, conv):
     
 def start_chat(container=st):
     #st.title("Cl3vr")
+    #st.markdown("""
+    #<div style="display:flex;align-items:center;gap:2px;margin:0 0 0.25rem 0;">
+    #<h1 style="margin:0;">Cl3vr</h1>
+    #<span style="background:#f59e0b;color:white;border-radius:999px;padding:2px 8px;font-size:0.8rem;font-weight:700;">BETA</span>
+    #</div>
+    #""", unsafe_allow_html=True)
+
     st.markdown("""
-    <div style="display:flex;align-items:center;gap:2px;margin:0 0 0.25rem 0;">
-    <h1 style="margin:0;">Cl3vr</h1>
-    <span style="background:#f59e0b;color:white;border-radius:999px;padding:2px 8px;font-size:0.8rem;font-weight:700;">BETA</span>
-    </div>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+        .header-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+    <h1 style="font-family:'Orbitron', sans-serif; font-size:2.5rem; letter-spacing:2px;" class="header-container">
+        <strong style="font-weight:900;">CL3VR</strong>
+        <span style="background:#f59e0b;color:white;border-radius:999px;padding:2px 8px;font-size:0.8rem;font-weight:700;">BETA</span>
+    </h1>
     """, unsafe_allow_html=True)
+
     st.subheader("Your AI assistant for Sales Compensation")
     st.markdown("Get instant answers to your sales compensation questions, design comp plans or SPIFs, analyze performance data, and streamline your workflows—all with AI-powered assistance.")
     #st.markdown("© 2025 Cl3vr AI. All rights reserved.")
