@@ -4,7 +4,8 @@ import streamlit as st
 from datetime import datetime
 from cl3vrapp import initialize_prompts, start_chat
 from src.admin_pages import show_admin_page
-from src.supabase_integration import get_supabase_client, get_user_from_db, get_conv_from_db
+from src.supabase_integration import get_supabase_client, get_user_from_db, get_conv_from_db, fetch_logos_for_account 
+from src.supabase_integration import download_logo_file
 
 def format_timestamp(timestamp):
     try:
@@ -39,18 +40,59 @@ def chat_ui():
 def logout_user():
     st.logout()
 
+def show_logo(supabase, user_record):
+    if user_record:
+        org_id = user_record.get("org_id")
+        account_id = user_record.get("account_id")
+        if org_id is None:
+            st.error("Org ID not found.")
+            return 
+        if account_id is None:
+            st.error("Account ID not found.")
+            return
+        
+        logo_files = fetch_logos_for_account(supabase, org_id, account_id)
+        
+        if logo_files is None or len(logo_files) == 0:
+            st.warning("User doesn't have a logo")
+            return
+        
+        logo_path = logo_files[0].get('storage_path')
+        
+        if logo_path is None:
+            st.error(f"Missing storage path in {logo_files}")
+            return
+
+        logo_buffer = download_logo_file(supabase, logo_path)
+        if logo_buffer is None:
+            st.error(f"Missing logo buffer in {logo_path}")
+            return
+
+        st.sidebar.image(logo_buffer)
+        
+
+    else:
+        st.warning("No user record.")
+
+
 
 
 def ui_with_pagenation():
     if st.user and st.user.is_logged_in:
-        #with st.sidebar.expander("account information"):
-        #    st.write(st.session_state)
-        st.sidebar.write(f"{st.user.get('name')}")
+        supabase = get_supabase_client()
         user_record = st.session_state.get("user_record")
-
         if not user_record:
             add_user_info_to_session_state()
             user_record = st.session_state.get("user_record")
+
+        show_logo(supabase, user_record)
+        
+        #with st.sidebar.expander("account information"):
+        #    st.write(st.session_state)
+        st.sidebar.write(f"{st.user.get('name')}")
+        
+
+        
         
         if user_record:
             account_name = user_record.get("account_name")
@@ -59,7 +101,7 @@ def ui_with_pagenation():
             #st.sidebar.write(f"{user_id=}")
             user_role = user_record.get("role", "guest")
             st.sidebar.write(f"{user_role=}")
-            supabase = get_supabase_client()
+            
             conv_history = get_conv_from_db(supabase, user_id)
             show_conv_history(conv_history)
 

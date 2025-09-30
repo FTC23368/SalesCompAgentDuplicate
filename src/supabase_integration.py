@@ -1,4 +1,6 @@
+import io
 import streamlit as st
+from typing import Optional, List
 from supabase import create_client, Client
 
 
@@ -222,6 +224,63 @@ def get_logos(_supabase, account_id):
         st.error(f"Error getting logos from database: {e}")
         print(f"Error getting logos from database: {e}")
         return None
+
+
+def upload_logo_file(supabase: Client, uploaded_file, account_id: str) -> Optional[str]:
+    file_name = uploaded_file.name
+    storage_path = f"{account_id}/{file_name}"
+    file_bytes = uploaded_file.getvalue()
+    try:
+        supabase.storage.from_("logos").upload(path=storage_path,file=file_bytes)
+        return storage_path
+    except Exception as exc:
+        st.error(f"Upload failed: {exc}")
+        return None
+
+def download_logo_file(supabase: Client, storage_path: str) -> Optional[io.BytesIO]:
+    try:
+        data = supabase.storage.from_("logos").download(storage_path)
+        return io.BytesIO(data)
+    except Exception as exc:
+        st.error(f"Download failed: {exc}")
+        return None
+
+def record_logo_entry(supabase: Client, org_id: str, account_id: str, filename: str, storage_path: str) -> bool:
+    payload = {
+        "org_id": org_id,
+        "account_id": account_id,
+        "filename": filename,
+        "storage_path": storage_path,
+    }
+    try:
+        response = supabase.table("logos").insert(payload).execute()
+    except Exception as exc:
+        st.error(f"Storing logo metadata failed: {exc}")
+        return False
+
+    error = getattr(response, "error", None)
+    if error:
+        message = getattr(error, "message", str(error))
+        st.error(f"Storing logo metadata failed: {message}")
+        return False
+
+    return True
+
+def fetch_logos_for_account(supabase: Client, org_id: str, account_id: str):
+    try:
+        response = (
+            supabase.table("logos")
+            .select("account_id, filename, storage_path, created_at")
+            .eq("org_id", org_id)
+            .eq("account_id", account_id)
+            .order("created_at", desc=True)
+            .execute()
+        )
+        return getattr(response, "data", None) or []
+    except Exception as exc:
+        st.error(f"Could not load logos: {exc}")
+        return []
+
 
 if __name__ == '__main__':
     supabase = get_supabase_client()
