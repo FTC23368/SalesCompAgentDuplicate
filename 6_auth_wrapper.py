@@ -102,7 +102,7 @@ def ui_with_pagenation():
             user_id = user_record.get("id")
             #st.sidebar.write(f"{user_id=}")
             user_role = user_record.get("role", "guest")
-            st.sidebar.write(f"{user_role=}")
+            #st.sidebar.write(f"{user_role=}")
             
             conv_history = get_conv_from_db(supabase, user_id)
             show_conv_history(conv_history)
