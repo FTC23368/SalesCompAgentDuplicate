@@ -100,15 +100,15 @@ def start_chat(container=st):
 
     st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
         .header-container {
             display: flex;
             align-items: center;
             gap: 10px;
         }
     </style>
-    <h1 style="font-family:'Orbitron', sans-serif; font-size:2.5rem; letter-spacing:2px;" class="header-container">
-        <strong style="font-weight:900;">CL3VR</strong>
+    <h1 style="font-family:'Audiowide', sans-serif; font-size:2.5rem; letter-spacing:2px;" class="header-container">
+        <strong style="font-weight:900;">C L 3 V R</strong>
         <span style="background:#f59e0b;color:white;border-radius:999px;padding:2px 8px;font-size:0.8rem;font-weight:700;">BETA</span>
     </h1>
     """, unsafe_allow_html=True)
