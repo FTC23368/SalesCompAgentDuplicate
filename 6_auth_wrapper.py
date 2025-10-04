@@ -5,13 +5,33 @@ from datetime import datetime
 from cl3vrapp import initialize_prompts, start_chat
 from src.admin_pages import show_admin_page
 from src.supabase_integration import get_supabase_client, get_user_from_db, get_conv_from_db, fetch_logos_for_account 
-from src.supabase_integration import download_logo_file
+from src.supabase_integration import download_logo_file, add_user
 
 def format_timestamp(timestamp):
     try:
         return datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S UTC')
     except:
         return timestamp 
+
+def create_cl3vr_direct_customer(user_login, user_name, auth_source="google", user_role="guest", 
+    org_id=1001, account_id=4, org_name='clv3r org', account_name='cl3vr direct customer'):
+    new_user = {
+            "login": user_login,
+            "auth_source": auth_source,
+            "full_name": user_name,
+            "org_id": org_id,
+            "account_id": account_id,
+            "org_name": org_name,
+            "account_name": account_name, 
+            "role": user_role
+        }
+    supabase = get_supabase_client()
+    response = add_user(supabase, new_user)
+
+    if response:
+        return new_user
+    else:
+        return None
 
 def add_user_info_to_session_state():
     email_address = st.user.get("email")
@@ -21,9 +41,14 @@ def add_user_info_to_session_state():
         if user_record:
             st.session_state.user_record = user_record
         else:
-            st.warning(f"Sorry, record not found for {email_address}. Please contact support")
+            response = create_cl3vr_direct_customer(email_address, st.user.get('name', 'unknown name'))
+            if response:
+                user_record = get_user_from_db(supabase, email_address)
+                if user_record:
+                    st.session_state.user_record = user_record
+            #st.warning(f"Sorry, record not found for {email_address}. Please contact support")
     else:
-        st.warning(f"Sorry, record not found for {email_address}. Please contact support")
+        st.warning(f"Please contact Cl3VR support at: hello@cl3vr.ai")
 
 
 def ui_not_logged_in():
@@ -54,7 +79,7 @@ def show_logo(supabase, user_record):
         logo_files = fetch_logos_for_account(supabase, org_id, account_id)
         
         if logo_files is None or len(logo_files) == 0:
-            st.warning("User doesn't have a logo")
+            #st.warning("User doesn't have a logo")
             return
         
         logo_path = logo_files[0].get('storage_path')
@@ -71,10 +96,6 @@ def show_logo(supabase, user_record):
         col1, col2, col3 = st.sidebar.columns([1, 2, 1])
         with col2:
             st.image(logo_buffer, width=100)
-        
-
-    else:
-        st.warning("No user record.")
 
 
 
@@ -94,7 +115,7 @@ def ui_with_pagenation():
         st.sidebar.write(f"{st.user.get('name')}")
         
 
-        
+        user_role = None
         
         if user_record:
             account_name = user_record.get("account_name")
